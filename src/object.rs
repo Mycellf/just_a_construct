@@ -1,4 +1,4 @@
-use macroquad::prelude::Color;
+use macroquad::prelude::*;
 use nalgebra::{vector, Vector2};
 use std::num::NonZeroU16;
 
@@ -8,17 +8,25 @@ pub struct MaterialVolume {
     pub size: Vector2<u32>,
     pub volume: Vec<Option<Material>>,
     pub update_handler: UpdateHandler,
+    pub image: Image,
+    pub texture: Texture2D,
 }
 
 impl MaterialVolume {
     pub fn new(size: Vector2<u32>) -> Self {
-        let elements = (size.x * size.y * 4) as usize;
+        let image_size = size * 2;
+        let elements = (image_size.x * image_size.y) as usize;
+
+        let image = Image::gen_image_color(image_size.x as u16, image_size.y as u16, BLANK);
+        let texture = Texture2D::from_image(&image);
 
         Self {
             capacity: size,
             size,
             volume: (0..elements).map(|_| None).collect(),
             update_handler: UpdateHandler::from_elements(elements),
+            image,
+            texture,
         }
     }
 
@@ -123,6 +131,32 @@ impl UpdateHandler {
 
         if needs_update {
             *self = Self::from_elements(elements);
+        }
+    }
+
+    pub fn register_update(&mut self, update: Vector2<u32>) {
+        match self {
+            Self::Full(update) => {
+                *update = true;
+            }
+            Self::Square(shape) => match shape {
+                Some((lower, upper)) => {
+                    if update.x < lower.x {
+                        lower.x = update.x;
+                    } else if update.x > upper.x {
+                        upper.x = update.x;
+                    }
+
+                    if update.y < lower.y {
+                        lower.y = update.y;
+                    } else if update.y > upper.y {
+                        upper.y = update.y;
+                    }
+                }
+                None => {
+                    *shape = Some((update, update));
+                }
+            },
         }
     }
 }
