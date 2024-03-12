@@ -53,6 +53,14 @@ impl MaterialVolume {
     pub fn set(&mut self, index: Vector2<u32>, value: Option<Material>) -> Option<()> {
         if in_bounds_of(self.size, index) {
             let index_1d = self.index_1d(index);
+            self.image.set_pixel(
+                index.x,
+                index.y,
+                match value {
+                    Some(material) => material.get_base_color(),
+                    None => BLANK,
+                },
+            );
             self.volume[index_1d] = value;
             self.update_handler.register_update(index);
 
@@ -64,6 +72,34 @@ impl MaterialVolume {
 
     pub fn index_1d(&self, index: Vector2<u32>) -> usize {
         (index.x + index.y * self.capacity.x) as usize
+    }
+
+    pub fn update(&mut self) {
+        match self.update_handler {
+            UpdateHandler::Full(true) => {
+                self.texture.update(&self.image);
+            }
+            UpdateHandler::Square(Some((lower, upper))) => {
+                let update_size = upper - lower + vector![1, 1];
+                let sub_image = self.image.sub_image(Rect::new(
+                    lower.x as f32,
+                    lower.y as f32,
+                    update_size.x as f32,
+                    update_size.y as f32,
+                ));
+
+                self.texture.update_part(
+                    &sub_image,
+                    lower.x as i32,
+                    lower.y as i32,
+                    update_size.x as i32,
+                    update_size.y as i32,
+                );
+            }
+            _ => (),
+        }
+
+        self.update_handler.clear_updates();
     }
 }
 
@@ -105,7 +141,7 @@ impl Material {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum UpdateHandler {
     Full(bool),
     Square(Option<(Vector2<u32>, Vector2<u32>)>),
@@ -158,6 +194,17 @@ impl UpdateHandler {
                     *shape = Some((update, update));
                 }
             },
+        }
+    }
+
+    pub fn clear_updates(&mut self) {
+        match self {
+            Self::Full(update) => {
+                *update = false;
+            }
+            Self::Square(shape) => {
+                *shape = None;
+            }
         }
     }
 }
