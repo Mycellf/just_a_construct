@@ -25,7 +25,7 @@ async fn main() {
         temputature: 0,
     });
 
-    let mut volume = object::MaterialVolume::new(vector![8, 8]);
+    let mut volume = object::MaterialVolume::new(vector![5, 13]);
     volume.set(vector![0, 0], test_pixel);
     volume.set(vector![1, 0], test_pixel);
     volume.set(vector![3, 3], test_pixel);
