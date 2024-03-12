@@ -4,7 +4,6 @@ use std::num::NonZeroU16;
 
 #[derive(Clone, Debug)]
 pub struct MaterialVolume {
-    pub capacity: Vector2<u32>,
     pub size: Vector2<u32>,
     pub volume: Vec<Option<Material>>,
     pub update_handler: UpdateHandler,
@@ -21,7 +20,6 @@ impl MaterialVolume {
         let texture = Texture2D::from_image(&image);
 
         Self {
-            capacity: size,
             size,
             volume: (0..elements).map(|_| None).collect(),
             update_handler: UpdateHandler::from_elements(elements),
@@ -71,7 +69,7 @@ impl MaterialVolume {
     }
 
     pub fn index_1d(&self, index: Vector2<u32>) -> usize {
-        (index.x + index.y * self.capacity.x) as usize
+        (index.x + index.y * self.size.x) as usize
     }
 
     pub fn update_texture(&mut self) {
