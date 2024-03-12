@@ -1,5 +1,6 @@
 use rapier2d::prelude::*;
 
+/// Stores and updates the physics environment of the `rapier2d` crate for convenience.
 pub struct PhysicsWorld {
     pub physics_pipeline: PhysicsPipeline,
     pub integration_parameters: IntegrationParameters,
