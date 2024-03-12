@@ -11,14 +11,14 @@ pub struct MaterialVolume {
 }
 
 impl MaterialVolume {
-    pub fn new(size: Vector2<u32>, update_handler: UpdateHandlerType) -> Self {
+    pub fn new(size: Vector2<u32>) -> Self {
         let elements = (size.x * size.y * 4) as usize;
 
         Self {
             capacity: size,
             size,
             volume: (0..elements).map(|_| None).collect(),
-            update_handler: update_handler.get_empty(),
+            update_handler: UpdateHandler::from_elements(elements),
         }
     }
 
@@ -100,22 +100,16 @@ impl Material {
 pub enum UpdateHandler {
     Full(bool),
     Square(Option<(Vector2<u32>, Vector2<u32>)>),
-    PointSet(Vec<(Vector2<u32>, Vector2<u32>)>),
 }
 
-#[derive(Clone, Copy, Debug)]
-pub enum UpdateHandlerType {
-    Full,
-    Square,
-    PointSet,
-}
+impl UpdateHandler {
+    pub const MAX_ELEMENTS_FULL: usize = 128;
 
-impl UpdateHandlerType {
-    pub fn get_empty(self) -> UpdateHandler {
-        match self {
-            Self::Full => UpdateHandler::Full(false),
-            Self::Square => UpdateHandler::Square(None),
-            Self::PointSet => UpdateHandler::PointSet(Vec::new()),
+    pub fn from_elements(elements: usize) -> Self {
+        if elements > Self::MAX_ELEMENTS_FULL {
+            Self::Square(None)
+        } else {
+            Self::Full(false)
         }
     }
 }
