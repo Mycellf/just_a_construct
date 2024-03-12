@@ -112,4 +112,17 @@ impl UpdateHandler {
             Self::Full(false)
         }
     }
+
+    /// Will void existing updates
+    pub fn update_from_elements(&mut self, elements: usize) {
+        let needs_update = (elements > Self::MAX_ELEMENTS_FULL)
+            ^ match self {
+                Self::Full(_) => false,
+                Self::Square(_) => true,
+            };
+
+        if needs_update {
+            *self = Self::from_elements(elements);
+        }
+    }
 }
