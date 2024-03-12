@@ -7,16 +7,18 @@ pub struct MaterialVolume {
     pub capacity: Vector2<u32>,
     pub size: Vector2<u32>,
     pub volume: Vec<Option<Material>>,
+    pub update_handler: UpdateHandler,
 }
 
 impl MaterialVolume {
-    pub fn new(size: Vector2<u32>) -> Self {
+    pub fn new(size: Vector2<u32>, update_handler: UpdateHandlerType) -> Self {
         let elements = (size.x * size.y * 4) as usize;
 
         Self {
             capacity: size,
             size,
             volume: (0..elements).map(|_| None).collect(),
+            update_handler: update_handler.get_empty(),
         }
     }
 
@@ -91,5 +93,29 @@ impl Material {
         }
 
         Color::new(channels[0], channels[1], channels[2], channels[3])
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum UpdateHandler {
+    Full(bool),
+    Square(Option<(Vector2<u32>, Vector2<u32>)>),
+    PointSet(Vec<(Vector2<u32>, Vector2<u32>)>),
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum UpdateHandlerType {
+    Full,
+    Square,
+    PointSet,
+}
+
+impl UpdateHandlerType {
+    pub fn get_empty(self) -> UpdateHandler {
+        match self {
+            Self::Full => UpdateHandler::Full(false),
+            Self::Square => UpdateHandler::Square(None),
+            Self::PointSet => UpdateHandler::PointSet(Vec::new()),
+        }
     }
 }
