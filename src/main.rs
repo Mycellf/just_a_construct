@@ -1,4 +1,6 @@
 use macroquad::prelude::*;
+use nalgebra::vector;
+use std::num::NonZeroU16;
 
 pub mod object;
 pub mod physics_world;
@@ -14,7 +16,21 @@ fn window_conf() -> Conf {
 #[macroquad::main(window_conf)]
 async fn main() {
     let material = make_tri_pixel_material();
-    let texture = load_texture("assets/wall.png").await.unwrap();
+
+    let test_pixel = Some(object::Material {
+        base_color: [255, 255, 255, 255],
+        integrity: 10,
+        max_integrity: NonZeroU16::new(10).unwrap(),
+        collision_layers: 0x01,
+        temputature: 0,
+    });
+
+    let mut volume = object::MaterialVolume::new(vector![8, 8]);
+    volume.set(vector![0, 0], test_pixel);
+    volume.set(vector![1, 0], test_pixel);
+    volume.set(vector![3, 3], test_pixel);
+    volume.set(vector![2, 3], test_pixel);
+    volume.update_texture();
 
     let mut camera = Camera2D {
         zoom: Vec2::splat(1.0 / 64.0),
@@ -28,7 +44,7 @@ async fn main() {
 
         gl_use_material(&material);
 
-        draw_texture(&texture, 0.0, 0.0, WHITE);
+        draw_texture(&volume.texture, 0.0, 0.0, WHITE);
 
         next_frame().await;
     }

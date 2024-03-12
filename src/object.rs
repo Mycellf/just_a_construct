@@ -74,7 +74,7 @@ impl MaterialVolume {
         (index.x + index.y * self.capacity.x) as usize
     }
 
-    pub fn update(&mut self) {
+    pub fn update_texture(&mut self) {
         match self.update_handler {
             UpdateHandler::Full(true) => {
                 self.texture.update(&self.image);
