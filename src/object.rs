@@ -54,6 +54,7 @@ impl MaterialVolume {
         if in_bounds_of(self.size, index) {
             let index_1d = self.index_1d(index);
             self.volume[index_1d] = value;
+            self.update_handler.register_update(index);
 
             Some(())
         } else {
