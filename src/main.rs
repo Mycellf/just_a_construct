@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 use std::num::NonZeroU16;
 
-pub mod object;
+pub mod material;
 pub mod physics_world;
 
 fn window_conf() -> Conf {
@@ -17,7 +17,7 @@ async fn main() {
     let material = make_tri_pixel_material();
     let test_image = load_image("assets/large_thruster.png").await.unwrap();
 
-    let test_pixel = object::Material {
+    let test_pixel = material::Material {
         base_color: [255, 255, 255, 255],
         integrity: 10,
         max_integrity: NonZeroU16::new(10).unwrap(),
@@ -25,7 +25,7 @@ async fn main() {
         temputature: 0,
     };
 
-    let volume = object::MaterialVolume::new_from_image(&test_image, test_pixel);
+    let volume = material::MaterialVolume::new_from_image(&test_image, test_pixel);
 
     let mut camera = Camera2D {
         zoom: Vec2::splat(1.0 / 64.0),
