@@ -4,6 +4,7 @@ use std::num::NonZeroU16;
 
 #[derive(Clone, Debug)]
 pub struct MaterialVolume {
+    /// Note that size is half the size of the image, texture, and vector of materials
     pub size: Vector2<u32>,
     pub volume: Vec<Option<Material>>,
     pub update_handler: UpdateHandler,
