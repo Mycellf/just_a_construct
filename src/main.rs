@@ -36,6 +36,8 @@ async fn main() {
     volume.set(vector![15, 0], test_pixel);
     volume.set(vector![15, 15], test_pixel);
     volume.set(vector![14, 15], test_pixel);
+    volume.set(vector![0, 14], test_pixel);
+    volume.set(vector![0, 15], test_pixel);
     volume.update_texture();
 
     let mut camera = Camera2D {
