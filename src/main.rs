@@ -28,7 +28,7 @@ async fn main() {
     let mut volume = object::MaterialVolume::new(vector![8, 8]);
     volume.set(vector![0, 0], test_pixel);
     volume.set(vector![1, 0], test_pixel);
-    volume.set(vector![3, 3], test_pixel);
+    volume.set(vector![3, 3], test_pixel).unwrap();
     volume.set(vector![2, 3], test_pixel);
     volume.update_texture();
 
