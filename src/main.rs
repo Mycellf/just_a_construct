@@ -2,6 +2,7 @@ use macroquad::prelude::*;
 use std::num::NonZeroU16;
 
 pub mod material;
+pub mod object;
 pub mod physics_world;
 
 fn window_conf() -> Conf {
