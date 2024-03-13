@@ -29,6 +29,35 @@ impl MaterialVolume {
         }
     }
 
+    /// For debug purposes only
+    pub fn new_from_image(image: &Image, material: Material) -> Self {
+        let size = vector![image.width as u32 / 2, image.height as u32 / 2];
+        let mut volume = Self::new(size);
+
+        for x in 0..size.x * 2 {
+            for y in 0..size.y * 2 {
+                let index = vector![x, y];
+
+                let color = image.get_image_data()[volume.index_1d(index)];
+
+                volume.set(
+                    index,
+                    match color[3] {
+                        0 => None,
+                        _ => Some(Material {
+                            base_color: color,
+                            ..material
+                        }),
+                    },
+                );
+            }
+        }
+
+        volume.update_texture();
+
+        volume
+    }
+
     pub fn get_pixel_at(&self, position: Vector2<f32>) -> Option<Material> {
         self.get(self.get_index_of_pixel(position))
     }

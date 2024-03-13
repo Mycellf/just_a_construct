@@ -1,5 +1,4 @@
 use macroquad::prelude::*;
-use nalgebra::vector;
 use std::num::NonZeroU16;
 
 pub mod object;
@@ -16,29 +15,17 @@ fn window_conf() -> Conf {
 #[macroquad::main(window_conf)]
 async fn main() {
     let material = make_tri_pixel_material();
+    let test_image = load_image("assets/large_thruster.png").await.unwrap();
 
-    let test_pixel = Some(object::Material {
+    let test_pixel = object::Material {
         base_color: [255, 255, 255, 255],
         integrity: 10,
         max_integrity: NonZeroU16::new(10).unwrap(),
         collision_layers: 0x01,
         temputature: 0,
-    });
+    };
 
-    let mut volume = object::MaterialVolume::new(vector![8, 8]);
-    volume.set(vector![0, 0], test_pixel);
-    volume.set(vector![1, 0], test_pixel);
-    volume.set(vector![3, 3], test_pixel);
-    volume.set(vector![2, 3], test_pixel);
-    volume.set(vector![14, 0], test_pixel);
-    volume.set(vector![14, 1], test_pixel);
-    volume.set(vector![15, 1], test_pixel);
-    volume.set(vector![15, 0], test_pixel);
-    volume.set(vector![15, 15], test_pixel);
-    volume.set(vector![14, 15], test_pixel);
-    volume.set(vector![0, 14], test_pixel);
-    volume.set(vector![0, 15], test_pixel);
-    volume.update_texture();
+    let volume = object::MaterialVolume::new_from_image(&test_image, test_pixel);
 
     let mut camera = Camera2D {
         zoom: Vec2::splat(1.0 / 64.0),
