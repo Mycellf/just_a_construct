@@ -6,7 +6,7 @@ pub mod physics_world;
 
 fn window_conf() -> Conf {
     Conf {
-        window_title: "Space Madness 404".to_string(),
+        window_title: "Just a Construct".to_string(),
         fullscreen: true,
         ..Default::default()
     }
