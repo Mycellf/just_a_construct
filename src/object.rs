@@ -51,7 +51,6 @@ impl MaterialVolume {
     pub fn set(&mut self, index: Vector2<u32>, value: Option<Material>) -> Option<()> {
         if in_bounds_of(self.size * 2, index) {
             let index_1d = self.index_1d(index);
-            println!("{index_1d}");
             self.image.get_image_data_mut()[index_1d] = match value {
                 Some(material) => material.base_color,
                 None => [0, 0, 0, 0],
