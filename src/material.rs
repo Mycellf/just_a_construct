@@ -31,6 +31,8 @@ impl MaterialVolume {
 
     /// For debug purposes only
     pub fn new_from_image(image: &Image, material: Material) -> Self {
+        assert!(image.width % 2 == 0 && image.height % 2 == 0);
+
         let size = vector![image.width as u32 / 2, image.height as u32 / 2];
         let mut volume = Self::new(size);
 
