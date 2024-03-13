@@ -51,14 +51,11 @@ impl MaterialVolume {
     pub fn set(&mut self, index: Vector2<u32>, value: Option<Material>) -> Option<()> {
         if in_bounds_of(self.size, index) {
             let index_1d = self.index_1d(index);
-            self.image.set_pixel(
-                index.x,
-                index.y,
-                match value {
-                    Some(material) => material.get_base_color(),
-                    None => BLANK,
-                },
-            );
+            println!("{index_1d}");
+            self.image.get_image_data_mut()[index_1d] = match value {
+                Some(material) => material.base_color,
+                None => [0, 0, 0, 0],
+            };
             self.volume[index_1d] = value;
             self.update_handler.register_update(index);
 
@@ -69,7 +66,7 @@ impl MaterialVolume {
     }
 
     pub fn index_1d(&self, index: Vector2<u32>) -> usize {
-        (index.x + index.y * self.size.x) as usize
+        (index.x + index.y * self.size.x * 2) as usize
     }
 
     pub fn update_texture(&mut self) {
