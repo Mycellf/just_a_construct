@@ -72,47 +72,6 @@ impl MaterialVolume {
         to_vector_u32(position * 2.0) + offset_of(position)
     }
 
-    pub fn get_pixel_set(&self, index: Vector2<u32>) -> [[Option<Material>; 2]; 2] {
-        let index_top = self.index_1d(index * 2);
-        let index_bottom = index_top + self.size.x as usize * 2;
-
-        [
-            [self.volume[index_top], self.volume[index_bottom]],
-            [self.volume[index_top + 1], self.volume[index_bottom + 1]],
-        ]
-    }
-
-    pub fn get_pixel_set_shape(&self, index: Vector2<u32>, bit_mask: u8) -> [[bool; 2]; 2] {
-        fn check_mask(material: Option<Material>, bit_mask: u8) -> bool {
-            match material {
-                Some(material) => material.collision_layers & bit_mask > 0,
-                None => false,
-            }
-        }
-
-        let set = self.get_pixel_set(index);
-
-        [
-            [
-                check_mask(set[0][0], bit_mask),
-                check_mask(set[0][1], bit_mask),
-            ],
-            [
-                check_mask(set[1][0], bit_mask),
-                check_mask(set[1][1], bit_mask),
-            ],
-        ]
-    }
-
-    pub fn get_pixel_set_shape_u8(&self, index: Vector2<u32>, bit_mask: u8) -> u8 {
-        let shape = self.get_pixel_set_shape(index, bit_mask);
-
-        (shape[0][0] as u8)
-            | ((shape[1][0] as u8) << 1)
-            | ((shape[0][1] as u8) << 2)
-            | ((shape[1][1] as u8) << 3)
-    }
-
     pub fn get(&self, index: Vector2<u32>) -> Option<Material> {
         if in_bounds_of(self.size * 2, index) {
             self.volume[self.index_1d(index)]
@@ -167,6 +126,47 @@ impl MaterialVolume {
         }
 
         self.update_handler.clear_updates();
+    }
+
+    pub fn get_pixel_set(&self, index: Vector2<u32>) -> [[Option<Material>; 2]; 2] {
+        let index_top = self.index_1d(index * 2);
+        let index_bottom = index_top + self.size.x as usize * 2;
+
+        [
+            [self.volume[index_top], self.volume[index_bottom]],
+            [self.volume[index_top + 1], self.volume[index_bottom + 1]],
+        ]
+    }
+
+    pub fn get_pixel_set_shape(&self, index: Vector2<u32>, bit_mask: u8) -> [[bool; 2]; 2] {
+        fn check_mask(material: Option<Material>, bit_mask: u8) -> bool {
+            match material {
+                Some(material) => material.collision_layers & bit_mask > 0,
+                None => false,
+            }
+        }
+
+        let set = self.get_pixel_set(index);
+
+        [
+            [
+                check_mask(set[0][0], bit_mask),
+                check_mask(set[0][1], bit_mask),
+            ],
+            [
+                check_mask(set[1][0], bit_mask),
+                check_mask(set[1][1], bit_mask),
+            ],
+        ]
+    }
+
+    pub fn get_pixel_set_shape_u8(&self, index: Vector2<u32>, bit_mask: u8) -> u8 {
+        let shape = self.get_pixel_set_shape(index, bit_mask);
+
+        (shape[0][0] as u8)
+            | ((shape[1][0] as u8) << 1)
+            | ((shape[0][1] as u8) << 2)
+            | ((shape[1][1] as u8) << 3)
     }
 }
 
