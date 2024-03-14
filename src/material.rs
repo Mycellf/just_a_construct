@@ -82,34 +82,38 @@ impl MaterialVolume {
         }
     }
 
-    pub fn set(&mut self, index: Vector2<u32>, value: Option<Material>) -> Option<()> {
+    pub fn set(&mut self, index: Vector2<u32>, new: Option<Material>) -> Option<()> {
         if in_bounds_of(self.size * 2, index) {
             let index_1d = self.index_1d(index);
 
-            match self.volume[index_1d] {
-                Some(material) => {
-                    self.mass -= material.mass as u32;
-                }
-                None => (),
-            }
+            self.update_mass(self.volume[index_1d], new);
 
-            match value {
-                Some(material) => {
-                    self.mass += material.mass as u32;
-                }
-                None => (),
-            }
-
-            self.image.get_image_data_mut()[index_1d] = match value {
+            self.image.get_image_data_mut()[index_1d] = match new {
                 Some(material) => material.base_color,
                 None => [0, 0, 0, 0],
             };
-            self.volume[index_1d] = value;
+            self.volume[index_1d] = new;
             self.update_handler.register_update(index);
 
             Some(())
         } else {
             None
+        }
+    }
+
+    fn update_mass(&mut self, old: Option<Material>, new: Option<Material>) {
+        match old {
+            Some(material) => {
+                self.mass -= material.mass as u32;
+            }
+            None => (),
+        }
+
+        match new {
+            Some(material) => {
+                self.mass += material.mass as u32;
+            }
+            None => (),
         }
     }
 
