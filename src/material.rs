@@ -7,7 +7,12 @@ pub struct MaterialVolume {
     /// Note that size is half the size of the image, texture, and vector of materials
     pub size: Vector2<u32>,
     pub volume: Vec<Option<Material>>,
+    /// Sum of all mass values stored in `volume`
     pub mass: u32,
+    /// Number of `volume` elements that are `Some`
+    pub area: u32,
+    /// Center of mass * `mass`
+    pub mass_displacement: Vector2<u32>,
     pub update_handler: UpdateHandler,
     pub image: Image,
     pub texture: Texture2D,
@@ -25,6 +30,8 @@ impl MaterialVolume {
             size,
             volume: (0..elements).map(|_| None).collect(),
             mass: 0,
+            area: 0,
+            mass_displacement: vector![0, 0],
             update_handler: UpdateHandler::from_elements(elements),
             image,
             texture,
@@ -86,7 +93,7 @@ impl MaterialVolume {
         if in_bounds_of(self.size * 2, index) {
             let index_1d = self.index_1d(index);
 
-            self.update_mass(self.volume[index_1d], new);
+            self.update_properties(self.volume[index_1d], new, index);
 
             self.image.get_image_data_mut()[index_1d] = match new {
                 Some(material) => material.base_color,
@@ -101,10 +108,23 @@ impl MaterialVolume {
         }
     }
 
-    fn update_mass(&mut self, old: Option<Material>, new: Option<Material>) {
+    fn update_properties(
+        &mut self,
+        old: Option<Material>,
+        new: Option<Material>,
+        index: Vector2<u32>,
+    ) {
+        let position = index / 2;
+        let pixel_part = index - position;
+        let pixel_part = vector![pixel_part.x > 0, pixel_part.y > 0];
+
+        let position = position * 4 + get_com_of_pixel_part(pixel_part);
+
         match old {
             Some(material) => {
                 self.mass -= material.mass as u32;
+                self.area -= 1;
+                self.mass_displacement -= position * material.mass as u32;
             }
             None => (),
         }
@@ -112,6 +132,8 @@ impl MaterialVolume {
         match new {
             Some(material) => {
                 self.mass += material.mass as u32;
+                self.area += 1;
+                self.mass_displacement += position * material.mass as u32;
             }
             None => (),
         }
@@ -189,6 +211,26 @@ impl MaterialVolume {
             | ((shape[0][1] as u8) << 2)
             | ((shape[1][1] as u8) << 3)
     }
+
+    pub fn get_com(&self) -> Vector2<f32> {
+        to_vector_f32(self.mass_displacement) / self.mass as f32
+    }
+}
+
+fn get_com_of_pixel_part(pixel_part: Vector2<bool>) -> Vector2<u32> {
+    if pixel_part.x {
+        if pixel_part.y {
+            vector![3, 2]
+        } else {
+            vector![2, 1]
+        }
+    } else {
+        if pixel_part.y {
+            vector![2, 3]
+        } else {
+            vector![1, 2]
+        }
+    }
 }
 
 fn offset_of(position: Vector2<f32>) -> Vector2<u32> {
@@ -202,6 +244,10 @@ fn offset_of(position: Vector2<f32>) -> Vector2<u32> {
 
 fn to_vector_u32(input: Vector2<f32>) -> Vector2<u32> {
     vector![input.x as u32, input.y as u32]
+}
+
+fn to_vector_f32(input: Vector2<u32>) -> Vector2<f32> {
+    vector![input.x as f32, input.y as f32]
 }
 
 fn in_bounds_of(lhs: Vector2<u32>, rhs: Vector2<u32>) -> bool {
