@@ -1,5 +1,5 @@
 use macroquad::prelude::*;
-use std::num::NonZeroU16;
+use nalgebra::{point, vector, Isometry2};
 
 pub mod material;
 pub mod object;
@@ -15,19 +15,8 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let material = make_tri_pixel_material();
-    let test_image = load_image("assets/large_thruster.png").await.unwrap();
-
-    let test_pixel = material::Material {
-        base_color: [255, 255, 255, 255],
-        integrity: 10,
-        max_integrity: NonZeroU16::new(10).unwrap(),
-        collision_layers: 0x01,
-        mass: 1,
-        temputature: 0,
-    };
-
-    let volume = material::MaterialVolume::new_from_image(&test_image, test_pixel);
+    let polygon =
+        object::PolygonCollider::new(vec![point![0, 0], point![0, 16], point![16, 16]], None);
 
     let mut camera = Camera2D {
         zoom: Vec2::splat(1.0 / 64.0),
@@ -39,9 +28,11 @@ async fn main() {
 
         update_camera(&mut camera);
 
-        gl_use_material(&material);
-
-        draw_texture(&volume.texture, 0.0, 0.0, WHITE);
+        polygon.draw_debug(
+            Isometry2::new(vector![0.0, 0.0], std::f32::consts::FRAC_PI_6),
+            0.15,
+            MAGENTA,
+        );
 
         next_frame().await;
     }
