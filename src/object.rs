@@ -18,7 +18,7 @@ impl PolygonCollider {
         Self { points, indices }
     }
 
-    /// Will not work well with extremely large values in points
+    /// Will not work well with extremely large values in the `points` vector
     pub fn draw_debug(&self, position: Isometry2<f32>, bold: f32, color: Color) {
         let points: Vec<_> = self
             .get_points_float(vector![0, 0])
@@ -39,7 +39,7 @@ impl PolygonCollider {
     pub fn get_points_float(&self, offset: Vector2<i32>) -> Vec<Point2<f32>> {
         (&*self.points)
             .into_iter()
-            .map(|point| to_point_f32((point + offset) / 2))
+            .map(|point| to_point_f32(point + offset) / 2.0)
             .collect()
     }
 }
