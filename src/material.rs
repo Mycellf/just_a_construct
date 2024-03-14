@@ -7,6 +7,7 @@ pub struct MaterialVolume {
     /// Note that size is half the size of the image, texture, and vector of materials
     pub size: Vector2<u32>,
     pub volume: Vec<Option<Material>>,
+    pub mass: u32,
     pub update_handler: UpdateHandler,
     pub image: Image,
     pub texture: Texture2D,
@@ -23,6 +24,7 @@ impl MaterialVolume {
         Self {
             size,
             volume: (0..elements).map(|_| None).collect(),
+            mass: 0,
             update_handler: UpdateHandler::from_elements(elements),
             image,
             texture,
@@ -83,6 +85,21 @@ impl MaterialVolume {
     pub fn set(&mut self, index: Vector2<u32>, value: Option<Material>) -> Option<()> {
         if in_bounds_of(self.size * 2, index) {
             let index_1d = self.index_1d(index);
+
+            match self.volume[index_1d] {
+                Some(material) => {
+                    self.mass -= material.mass as u32;
+                }
+                None => (),
+            }
+
+            match value {
+                Some(material) => {
+                    self.mass += material.mass as u32;
+                }
+                None => (),
+            }
+
             self.image.get_image_data_mut()[index_1d] = match value {
                 Some(material) => material.base_color,
                 None => [0, 0, 0, 0],
