@@ -193,6 +193,7 @@ pub struct Material {
     pub integrity: u16,
     pub max_integrity: NonZeroU16, // Used non-zero type for memory usage with Option<Material>
     pub collision_layers: u8,
+    pub mass: u16,
     pub temputature: i8, // May be replaced in the future
 }
 

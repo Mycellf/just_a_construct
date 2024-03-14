@@ -23,6 +23,7 @@ async fn main() {
         integrity: 10,
         max_integrity: NonZeroU16::new(10).unwrap(),
         collision_layers: 0x01,
+        mass: 1,
         temputature: 0,
     };
 
