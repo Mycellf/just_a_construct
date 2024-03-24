@@ -1,5 +1,6 @@
 use macroquad::prelude::*;
 
+pub mod object;
 pub mod physics_world;
 
 fn window_conf() -> Conf {
