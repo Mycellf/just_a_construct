@@ -1,8 +1,5 @@
 use macroquad::prelude::*;
-use nalgebra::{point, vector, Isometry2};
 
-pub mod material;
-pub mod object;
 pub mod physics_world;
 
 fn window_conf() -> Conf {
@@ -15,9 +12,6 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let polygon =
-        object::PolygonCollider::new(vec![point![0, 0], point![0, 16], point![16, 16]], None);
-
     let mut camera = Camera2D {
         zoom: Vec2::splat(1.0 / 64.0),
         ..Default::default()
@@ -27,12 +21,6 @@ async fn main() {
         clear_background(BLACK);
 
         update_camera(&mut camera);
-
-        polygon.draw_debug(
-            Isometry2::new(vector![0.0, 0.0], std::f32::consts::FRAC_PI_6),
-            0.15,
-            MAGENTA,
-        );
 
         next_frame().await;
     }
